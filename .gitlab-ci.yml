@@ -1,0 +1,41 @@
+image: debian:stretch
+
+variables:
+  UTILIKIT_CONFIG_TYPE: "debian_stretch"
+#  ANDROID_BUILD_TOOLS: "24.0.0"
+#  ANDROID_SDK_TOOLS: "24.4.1"
+
+before_script:
+  - apt-get update --yes
+  - apt-get install --yes packaging-dev python3 python2 ninja-build 
+  - export UTILIKIT_CONFIG_TYPE=debian_stretch
+  - mkdir build/
+  - mkdir build/sandbox
+  - mkdir build/downloads
+  - ./utilikit/prepare_sources.py
+  - ./utilikit/substitute_domains.py
+  - ./utilikit/generate_build_files.py debian --flavor standard --apply-domain-substitution
+  - cd build/sandbox
+  - dpkg-checkbuilddeps # Checks and reports any additional packages needed
+  - dpkg-buildpackage -b -uc
+
+#  - wget --quiet --output-document=android-sdk.tgz https://dl.google.com/android/android-sdk_r${ANDROID_SDK_TOOLS}-linux.tgz
+#  - tar --extract --gzip --file=android-sdk.tgz
+#  - echo y | android-sdk-linux/tools/android --silent update sdk --no-ui --all --filter android-${ANDROID_COMPILE_SDK}
+
+stages:
+  - build
+#  - test
+
+build:
+  stage: build
+  script:
+    - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - app/build/outputs/
+
+#unitTests:
+#  stage: test
+#  script:
+#    - ./gradlew test
