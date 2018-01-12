@@ -12,17 +12,20 @@ before_script:
   - mkdir build/downloads
 
 stages:
-# - test
+#  - test
   - build
 
 build:
   stage: build
+  only:
+  - tags
+  - triggers
   script:
     - ./utilikit/prepare_sources.py
     - ./utilikit/substitute_domains.py
     - ./utilikit/generate_build_files.py debian --flavor standard --apply-domain-substitution
     - cd build/sandbox
-#   - dpkg-checkbuilddeps # Checks and reports any additional packages needed
+    # - dpkg-checkbuilddeps # Checks and reports any additional packages needed
     - echo -en "y\n" | mk-build-deps -i debian/control > /dev/null # install any additional packages needed
     - dpkg-buildpackage -b -uc | grep -v "warning"
     - cd ../../
