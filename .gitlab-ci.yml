@@ -6,7 +6,7 @@ before_script:
   - apt-get -qq update --yes
   - apt-get -qq install --yes packaging-dev python3 python ninja-build > /dev/null
   - apt-get install --yes devscripts
-  - export UTILIKIT_CONFIG_TYPE=debian_stretch
+  - export UTILIKIT_CONFIG_TYPE=linux_portable
   - mkdir build/
   - mkdir build/sandbox
   - mkdir build/downloads
@@ -32,9 +32,7 @@ build:
     - ls -la ./build # our built files should be in here
   artifacts:
     paths:
-    - ./build/*.deb
-    - ./build/*.changes
-    - ./build/*.buildinfo
+    - ./build/*.*
 
 #unitTests:
 #  stage: test
