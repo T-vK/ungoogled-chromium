@@ -5,8 +5,6 @@ image: debian:stretch
 before_script:
   - apt-get -qq update --yes
   - apt-get -qq install --yes packaging-dev python3 python ninja-build > /dev/null
-  - apt-get install --yes devscripts
-  - export UTILIKIT_CONFIG_TYPE=linux_portable
   - mkdir build/
   - mkdir build/sandbox
   - mkdir build/downloads
@@ -21,9 +19,10 @@ build:
   - tags
   - triggers
   script:
+    - export UTILIKIT_CONFIG_TYPE=linux_portable
     - ./utilikit/prepare_sources.py
     - ./utilikit/substitute_domains.py
-    - ./utilikit/generate_build_files.py debian --flavor standard --apply-domain-substitution
+    - ./utilikit/generate_build_files.py debian --flavor minimal --apply-domain-substitution
     - cd build/sandbox
     # - dpkg-checkbuilddeps # Checks and reports any additional packages needed
     - echo -en "y\n" | mk-build-deps -i debian/control > /dev/null # install any additional packages needed
