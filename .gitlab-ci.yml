@@ -1,0 +1,33 @@
+# Important: Make sure to increase the default timeout of 60 minutes in the (Project!) Settings -> CI/CD -> General pipelines settings
+
+image: debian:stretch
+
+before_script:
+  - apt-get -qq update --yes
+  - apt-get -qq install --yes packaging-dev python3 python ninja-build > /dev/null
+  #- mkdir build/
+  #- mkdir build/sandbox
+  #- mkdir build/downloads
+
+stages:
+  - build
+
+build-src-pkg:
+  stage: build
+  #only:
+    #- tags
+    #- triggers
+  script:
+    - mkdir -p build/src
+    - ./get_package.py PACKAGE_TYPE_HERE build/src/debian
+    - cd build/src
+    # If necessary, change the dependencies in debian/control to accomodate your environment.
+    # If necessary, modify AR, NM, CC, and CXX variables in debian/rules
+    - debian/rules get-orig-source
+    - cd ..
+    - dpkg-source -b src
+    - cd ../../
+    - ls -la ./build # our built files should be in here
+  artifacts:
+    paths:
+      - ./build/*.*
